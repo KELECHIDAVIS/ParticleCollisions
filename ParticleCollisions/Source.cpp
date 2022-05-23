@@ -2,43 +2,13 @@
 #include <iostream> 
 /* OPTIONAL: ADD BOUNCY BALL SIMULATION WITH VECTOR POINT IN THE DIRECTION OF VELOCITY AND ACCELERATION */
 
-
-struct Wall
-{
-	 
-	sf::RectangleShape bound;
-	sf::Color color; 
-	Wall()
-	{}
-
-	Wall(int x ,int y , int width , int height , sf::Color color)
-	{
-		bound.setSize(sf::Vector2f(width,height));
-		bound.setOrigin(bound.getSize().x/2,bound.getSize().y/2); 
-		bound.setPosition(x, y);
-		bound.setFillColor(color);
-		
-
-	}
-
-	void draw(sf::RenderWindow &window)
-	{
-		window.draw(bound); 
-	}
-
-	void update()
-	{
-
-	}
-
-};
 int main()
 {
-	int width = 600, height = 600, frameLimit = 60, borderOffset = 40, borderWidth =550, borderHeight = 30, ballSize = 30; 
+	int width = 600, height = 600, frameLimit = 60, borderOffset = 40, borderWidth =525, borderHeight = 8, ballSize = 30; 
 	sf::RenderWindow window(sf::VideoMode(width, height), "Particle Collisions"); 
 	sf::Clock clock;
 	sf::Color boundColor = sf::Color::Blue, ballColor = sf::Color::Red;
-	sf::Vector2f ballPos(width/2, borderOffset+borderHeight+ballSize+1), ballVel(0,0), ballAcc(0,1); 
+	sf::Vector2f ballPos(width/2, borderOffset+borderHeight+ballSize+borderWidth/2), ballVel(100,-300), ballAcc(0,350); // Heres where you affect the ball initial accel
 	sf::Event event; 
 	Wall bounds[4] = {Wall(width/2,borderOffset,borderWidth,borderHeight,boundColor),
 					Wall(width / 2,height-borderOffset,borderWidth,borderHeight,boundColor),
@@ -46,6 +16,9 @@ int main()
 					Wall(width - borderOffset,height / 2,borderHeight,borderWidth,boundColor) };
 	Ball ball(ballSize, ballColor, ballPos,ballVel,ballAcc); 
 	window.setFramerateLimit(frameLimit); 
+	Arrow arrow(ball.ball,ballVel);
+	
+	 
 	while (window.isOpen())
 	{
 		while (window.pollEvent(event))
@@ -60,8 +33,8 @@ int main()
 				break; 
 			}
 		}
-
-		std::cout << (int)(1.f/clock.getElapsedTime().asSeconds()) << std::endl; 
+		//std::cout << ball.vel.x << std::endl; 
+	//	std::cout << (int)(1.f/clock.getElapsedTime().asSeconds()) << std::endl; 
 		
 		//update 
 		for (Wall wall : bounds)
@@ -69,7 +42,7 @@ int main()
 			wall.update(); 
 		}
 
-		//ball.update(); 
+		ball.update(clock.getElapsedTime().asSeconds(),bounds[0],bounds[1],bounds[2],bounds[3], borderOffset);
 		//update
 
 
@@ -84,7 +57,7 @@ int main()
 		}
 
 		ball.draw(window); 
-
+		window.draw(arrow.pointer); 
 		//draw
 		window.display(); 
 	}
